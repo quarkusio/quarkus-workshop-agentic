@@ -43,7 +43,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '18'
       - name: Maven Build for ${{ matrix.app }}
         working-directory: ${{ matrix.app }}
         run: ./mvnw -B clean verify -Dquarkus.http.host=0.0.0.0 -DskipITs=false
