@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.parasol</groupId>
-  <artifactId>insurance-app</artifactId>
+  <artifactId>parasol-service</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <properties>
     <assertj.version>3.27.3</assertj.version>

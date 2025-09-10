@@ -5,7 +5,7 @@ docs_dir: docs
 
 nav:
   - Requirements: 'requirements.md'
-  - Step 1 - Function Calling: 'step-01.md'
+  - Step 1 - Sentiment Detection: 'step-01.md'
 #  - Step 2 - MCP: Insurance Quote as External Tool 'step-02.md'
 #  - Step 3 - Workflow Pattern: Routing: 'step-03.md'
 #  - Step 4 - Orchestrator Pattern: Multi-Step Task: 'step-04.md'
