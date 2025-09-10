@@ -26,8 +26,10 @@ jobs:
       fail-fast: false
       matrix:
         app:
-          - app
-          # - step01
+          - solution/parasol-service
+          - solution/customer-mcp
+          - solution/expert-agent
+          # - steps/step01
 
     name: "Build ${{ matrix.app }}"
     steps:
