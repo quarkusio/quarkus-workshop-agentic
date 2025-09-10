@@ -1,0 +1,92 @@
+name: Sync to ai-llm-template
+
+env:
+  LLM_TEMPLATE_REPO: rh-rad-ai-roadshow/ai-llm-template
+
+on:
+  workflow_run:
+    workflows:
+      - "Simple build and test"
+    branches:
+      - main
+    types:
+      - completed
+  workflow_dispatch:
+
+concurrency:
+  group: "workflow = ${{ github.workflow }}, ref = ${{ github.event.workflow_run.head_branch || github.event.ref || github.ref }}"
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  calculate-refs:
+    if: ((github.event_name == 'workflow_dispatch') || ((github.event_name == 'workflow_run') && ((github.event.workflow_run.event == 'push') || (github.event.workflow_run.event == 'workflow_dispatch')) && (github.event.workflow_run.conclusion == 'success'))) && ((github.repository == 'rh-rad-ai-roadshow/parasol-insurance') && ((github.event.workflow_run.head_branch == 'main')))
+    runs-on: ubuntu-latest
+    outputs:
+      ref: ${{ steps.calculate_branch.outputs.ref}}
+      message: ${{ steps.calculate_branch.outputs.message }}
+    steps:
+      - name: Calculate Branch
+        id: calculate_branch
+        run: |
+          if [[ ${{ github.event_name }} == 'workflow_run' ]]; then
+            echo "ref=${{ github.event.workflow_run.head_commit.id }}" >> $GITHUB_OUTPUT
+            echo "message<<EOF"$'\n'"${{ github.event.workflow_run.head_commit.message }}"$'\n'EOF >> $GITHUB_OUTPUT
+          elif [[ ${{ github.event_name}} == 'workflow_dispatch' ]]; then
+            echo "ref=${{ github.sha }}" >> $GITHUB_OUTPUT
+            echo "message<<EOF"$'\n'"$(git log -1 --pretty=%B | head)"$'\n'EOF >> $GITHUB_OUTPUT
+          fi
+
+  sync:
+    if: ((github.event_name == 'workflow_dispatch') || ((github.event_name == 'workflow_run') && ((github.event.workflow_run.event == 'push') || (github.event.workflow_run.event == 'workflow_dispatch')) && (github.event.workflow_run.conclusion == 'success'))) && ((github.repository == 'rh-rad-ai-roadshow/parasol-insurance') && ((github.event.workflow_run.head_branch == 'main')))
+    needs: calculate-refs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/create-github-app-token@v1
+        id: generate-token
+        with:
+          app-id: ${{ secrets.SYNC_APP_ID }}
+          private-key: ${{ secrets.SYNC_PRIVATE_KEY }}
+          repositories: ai-llm-template
+
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+        with:
+          path: parasol-insurance
+          ref: ${{ needs.calculate-refs.outputs.ref }}
+
+      - name: Checkout ai-llm-template repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.LLM_TEMPLATE_REPO }}
+          path: ai-llm-template
+          token: ${{ steps.generate-token.outputs.token }}
+
+      - name: Sync to ai-llm-template
+        run: $(pwd)/parasol-insurance/.github/workflows/scripts/sync-to-ai-llm-template.sh $(realpath "$(pwd)/parasol-insurance") $(realpath "$(pwd)/ai-llm-template")
+
+      - name: Create Pull Request in ${{ env.LLM_TEMPLATE_REPO }}
+        uses: peter-evans/create-pull-request@v7
+        with:
+          path: ai-llm-template
+          commit-message: ${{ needs.calculate-refs.outputs.message }}
+          branch: sync-llm-template
+          delete-branch: true
+          title: "Sync commit ${{ needs.calculate-refs.outputs.ref }} (from ${{ github.workflow }} run # ${{ github.run_number }})"
+          body: |
+            Syncing commit [${{ needs.calculate-refs.outputs.ref }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ needs.calculate-refs.outputs.ref }}) changes from [${{ github.workflow }} run # ${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) to ${{ github.server_url }}/${{ env.LLM_TEMPLATE_REPO }}.
+            
+            Original commit message:
+            
+            ```
+            ${{ needs.calculate-refs.outputs.message }}
+            ```
+          labels: change-sync
+          reviewers: danieloh30
+          token: ${{ steps.generate-token.outputs.token }}
