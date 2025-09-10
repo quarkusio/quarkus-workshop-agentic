@@ -1,35 +1,12 @@
 version: 2
 updates:
+  #  Main branch
   - package-ecosystem: maven
-    directory: app
+    directory: "/"
     schedule:
       interval: daily
-
-  - package-ecosystem: github-actions
-    directory: /
+    open-pull-requests-limit: 10
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
-      interval: daily
-
-  - package-ecosystem: maven
-    directory: app
-    schedule:
-      interval: daily
-    target-branch: email-feature-branch
-
-  - package-ecosystem: github-actions
-    directory: /
-    schedule:
-      interval: daily
-    target-branch: email-feature-branch
-
-  - package-ecosystem: maven
-    directory: app
-    schedule:
-      interval: daily
-    target-branch: private-docs-rag-solution
-
-  - package-ecosystem: github-actions
-    directory: /
-    schedule:
-      interval: daily
-    target-branch: private-docs-rag-solution
+      interval: "weekly"
