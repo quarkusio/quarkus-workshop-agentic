@@ -41,7 +41,7 @@ jobs:
           distribution: temurin
           cache: maven
       - name: Install Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '18'
       - name: Maven Build for ${{ matrix.app }}
