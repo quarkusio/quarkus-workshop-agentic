@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 public class Claim extends PanacheEntity {
     public String claimNumber;
     public String category;
-    public String policyNumber;    
+    public String policyNumber;
     @Column(columnDefinition="DATETIME")
     @Temporal(TemporalType.DATE)
     public LocalDate inceptionDate;
@@ -26,6 +26,7 @@ public class Claim extends PanacheEntity {
     public String body;
     @Column(length = 5000)
     public String summary;
+    @Column(columnDefinition = "TEXT")
     public String location;
     @Column(name = "claim_time")
     public String time;
@@ -33,4 +34,8 @@ public class Claim extends PanacheEntity {
     public String sentiment;
     public String emailAddress;
     public String status;
+    @Column(columnDefinition = "TEXT")
+    public String originalImages; // JSON array of original image objects
+    @Column(columnDefinition = "TEXT")
+    public String processedImages; // JSON array of processed image objects
 }

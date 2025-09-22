@@ -29,7 +29,7 @@ const ClaimDetail: React.FunctionComponent<ClaimProps> = () => {
         setClaim(response.data);
       })
       .catch(error => {
-        console.error(error);
+        console.error("Error fetching claim data:", error);
       });
 
   }, [claim_id]);
@@ -137,7 +137,7 @@ const ClaimDetail: React.FunctionComponent<ClaimProps> = () => {
                           <GridItem span={11} className='padding-top-25'>
                             <TextContent>
                               <Text component={TextVariants.h3}>Location of event</Text>
-                              <Text>{claim.location ? claim.location : 'Not processed yet'}</Text>
+                              <Text>{claim.location || 'Not processed yet'}</Text>
                             </TextContent>
                           </GridItem>
                           <GridItem span={1} className='padding-top-25'>
