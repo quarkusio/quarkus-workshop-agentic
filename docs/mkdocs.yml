@@ -116,6 +116,7 @@ plugins:
 
 
 extra:
+  plantuml_theme_dir: https://quarkus.io/assets/plantuml/themes
   snippet_dir: ../
   manifest: manifest.webmanifest
   version:
